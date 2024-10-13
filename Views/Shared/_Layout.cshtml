@@ -1,0 +1,71 @@
+﻿@*
+    when a view is returned by action method, order is:
+    _ViewImports.cshtml //imports common C# namespaces etc
+    _ViewStart.cshtml
+    View.cshtml // the actual target view with the content to return
+    _LayoutView.cshtml // common elements between views, .css stylesheet header website title etc
+    == response //after all C# execution in above order the output is combined into HTML response
+
+    partial and layout views are prefixed by _ convention to easily distinguish from actual views
+    since partial/layout cannot execute as a view on their own, that is a layout is executed first
+    and the ACTUAL target view file content is inserted at RenderBody() call
+
+    the point is the layout may be a common element between all views, like a header navbar or footer details
+    and when a user clicks a link, these elements will be present in the next webpage, the body content needs to change
+    so the layout may automatically add the navbar to both the initial and target page, replacing RenderBody() with their page content
+
+    IMPORTANT
+    by default, any actual view.cshtml file has a Layout property that defaults to null
+    without setting this property to point to a layout, THE LAYOUT WILL NOT EXECUTE
+    so in this case the Layout property of the view should be set to Layout = "~/View/Shared/_Layout.cshtml"; 
+    it could point to different layouts in different views, different device types
+    this property is being set at Index.cshtml, but not PersonDetails.cshtml so will only show in Index view
+    when the view is returned by the actionMethod, the target View lets say Index is executed FIRST and its full output
+    is then passed to the _Layout, which executes the Layout code and inserts @RenderBody() call the result of the actual view, here Index
+
+    the fact that layoutview will process after the target view, and essentially merge the two executions into one output HTML response
+    this makes it easy to add a css stylesheet, a common header that does not change between pages, perhaps footer contact info etc
+    anything that needs to persiste between pages
+*@
+@{
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Asp.Net Core Demo App</title>
+    <link href="~/StyleSheet.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="navbar-brand">AspNet Core App</div>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about-company">About</a></li>
+                <li><a href="/contact-support">Contact</a></li>
+                <li><a href="/products">All Products</a></li>
+                <li><a href="/search-products">Search Products</a></li>
+                <li><a href="/order-product">Order Product</a></li>
+            </ul>
+        </div>
+
+        <div class="page-content">
+            @RenderBody()
+        </div>
+    </div>
+</body>
+@*this RenderSection below will look for a section passed from view with 1st param name 
+    and replace the method call with its HTML content, 
+    if 2nd param is true, Layout will throw error if View does not provide content for named section
+    important to note this is connected to @section sectionName in the View routing to this layout, not a <section> HTML
+
+    RenderSection use cases may be for example to import a standard common to all views inserts like a layout itself,
+    but perhaps condicionally, for example if index.cshtml <script src="index.js"> to import javascript file to browser
+        to add a common footer to all responses
+*@
+@RenderSection("footer_content", false)
+</html>

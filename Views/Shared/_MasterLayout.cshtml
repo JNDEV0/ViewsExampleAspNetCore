@@ -1,0 +1,38 @@
+﻿@*
+        this nesting is not common but is a solution that can be used, for example MasterLayout contains a common navbar, scripts CSS etc
+    and the nested layouts vary from the landing page, to the project view, to the reviews, to the contact pages etc,
+    each which may have their own specific content that gets passed to the nested layouts and filled into the the target nested layout structure
+
+    in this example (that is actually not functioning correctly, just for example purpose)
+    the MasterLayout, that is simply the Layout of _Layout, that is the Layout of Index view the later receives the output of the previous 3-2-1
+    knowing this they can be nested to include common content amongst the views, for example _Layout2 could be called on by PersonDetail view
+    and _Layout2 could also have a common MasterLayout as _Layout which attends to Index view
+*@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <title>Asp.Net Core Demo App</title>
+        <link href="~/StyleSheet.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="navbar">
+                <div class="navbar-brand">AspNet Core App</div>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about-company">About</a></li>
+                    <li><a href="/contact-support">Contact</a></li>
+                    <li><a href="/products">All Products</a></li>
+                    <li><a href="/search-products">Search Products</a></li>
+                    <li><a href="/order-product">Order Product</a></li>
+                </ul>
+            </div>
+
+            <div class="page-content">
+                @*here RenderBody reffers to the output of the nested layout, which is itself a layout for a target view layoutception!*@
+                @RenderBody()
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,215 @@
+﻿<!-- 
+    ASP.NET Razor view files are a mixture
+    of C# and HTML, the C# must be inside this symbol:
+    @{} 
+    any code inside including local variables, local methods,
+    will execute first, then the html content receives the
+    output of the C# code, and sends plain HTML as the view response
+    so the content received by the browser is purely HTML, any codeblocks
+    expressions, methods calculations occur on serverside
+    to create the HTML response content
+    
+    any C# code in a view should me minimal and related
+    to the presentation/construction of the view
+    THE EXAMPLES SHOWN IN THIS FILE ARE NOT THE RIGHT WAY
+    ViewData should be passed to the view as structured data
+    from the controller that has access to a validated data model
+    so the ViewData's fields can be showns in the view
+
+    also, comments in Razor are:
+--> 
+@using ViewsExample.Models;
+
+@*
+    this will be commented out of both CH and HTML content
+    whereas the HTML comment above will actually be sent
+    to the client browser in the response
+    also Visual Studio Code IDE recognizes Razor pages and
+    default comment/uncomment commands create this syntax
+
+    //the statement below specifying a model type,
+    //is making known to the View the type expected from the controller
+    //the Model statement then becomes accessible in the view
+    //with the proper intellisense properties of the class type
+    //see line 92
+*@
+@model List<PersonModel>; 
+
+@{
+    //see _Layout.cshtml in Views/Shared for explanation
+    //layout view is a sort of wrapper for view elements
+    //by setting the Layout property here, the target layout will be called first
+    //and where RenderBody() is called in the layout, the content OF THIS actual view will appear.
+    //useful for a navbar common to all views for example
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    //inside {} HTML can be provided directly, and static text
+    //inside <text> or after At symbol and :
+    //this single line will be static text in the HTML response
+    //this example below where a person is instantiated manually inside
+    //the index is not the right way, just for example.
+    //see ViewData or ViewBag
+    @:the above navbar is added by the _Layout.cshtml file
+
+    //demonstrate that C# code inside the brackets 
+    //can be executed directly in the view file
+    PersonModel person = new PersonModel()
+    {
+        Name = "oldName",
+        DateOfBirth = Convert.ToDateTime("2000-07-01")
+    };
+
+    //localFunctions can operate some logic and be called
+    //within the same Razor view, useful for repeated functions
+    //for example a repeated processing of information
+    //local functions cannot be called outside the view
+    string WelcomeMsgMethod() { return "default welcome message returned string response called within Index.cshtml";  }
+}
+
+@*this section below shows how to pass content to Layouts, aside from ViewBag and ViewData
+    even thought the section here is defined early in this document, it will not render its content until
+    called via RenderContent("sectionName") where sectionName here is footer_content
+    and it will insert the content of named section same way that RenderBody() inserts the View result passed to Layout
+
+    IMPORTANT
+    in the case of multiple views sharing Layouts, the layout may expect a RenderSection("sectionName") however
+    a view may not supply any section with that name, for example, PersonDetails may have footer_content2 instead
+    RenderSection() takes a second parameter to stipulate if the named section is required, if true the view MUST supply section content
+    or layout will throw an error, if not required, will not throw error.
+    see _Layout.cshtml in Views/Shared folder
+*@
+@section footer_content {
+
+}
+
+@{
+    if (true)
+    {
+        //note that insde the basic @ codeblock
+        //the if keyword is directly accessible
+        //unlike the @foreach block below,
+        //that requires the @if Razor version
+        //point is using this @ syntax C# runs inside these "Razor" files 
+        //that allow mixing the text with and outputs HTML
+    }
+    //The ViewData is a common KVP IDictionary derived collection, between the controller and the view
+    //this means that ViewData["key"] can receive any object derived class, as an object,
+    //so if a collection of Persons, well call People, can be passed at the controller aciton Method as
+    //ViewData["people"] = new List<Person>() and new persons added to the list at the controller,
+    //and then the related view will automatically be able to access the ViewData and its people collection
+    //ViewData["people"] on its own is a key in the ViewData dictionary, that points to the collection
+    //instantiated in the actionMethod and then assigned to the ViewData key.
+    //HOWEVER all stored references will be of object type, so casting back to respective classes may be needed
+    List<PersonModel> people = (List<PersonModel>)ViewData["people"]; //typasting from object back to actual class is needed
+
+    //alternatively the ViewBag is preferred as it needs no typecasting,
+    //instead the ViewData's key becomes a property of viewbag
+    //ViewBag itself is a dynamic property of Controller and View, 
+    //dynamic here means in control of CLR runtime, not of compiler, 
+    //so dynamic is similar to var, however the people property of ViewBag is object by default
+    //so var actually is better not used with ViewBag, 
+    // since specifying the actual target type will cast it to its type correctly
+    //also as base object type no classes will have properties in intelisense
+    //with purpose of wrapping input and output of data between Controller and View
+    List<PersonModel> people2 = ViewBag.people;
+
+    //here the keyword Model, which is of the expected List<PersonModel>
+    //is used to assign the expected list that should be passed from controller
+    //inside the View(object) returned by the controller, see HomeController.cs
+    people2 = Model;
+}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Default Index.cshtml View
+        </title>
+        <meta charset="utf-8"/>
+    </head>
+    <body>
+        <h1>Welcome</h1>
+        @*
+            note tha use of Html.Raw() below, this makes
+            it so a string content is given as "raw" data
+            even if it contains HTML content such as <p>...
+            instead of the tag being compiled into the HTML
+            returned in the request, instead the content
+            will be given as a static string value
+            this can be dangerous especially for handling
+            incoming user input, should never be used for that
+            however can be useful for sennding error messages
+            in the response View if desired
+        *@
+        <p>@Html.Raw(WelcomeMsgMethod())</p>
+        <!-- 
+            C# code variables, methods etc can be called inside HTML, and HTML can be inserted directly
+            into At symbol C# code blocks, allowing conditional content
+        -->
+        <p>
+            Hello @person.Name!
+            This html code is not actually executed on the server,
+            the entire Index.cshtml file, when identified as 
+            the correct View file to return.
+        </p>
+        @if (person.DateOfBirth != null){
+            //note the @if (condition) statement above, will skip this entire block if condition
+            //all code blocks share the same scope, here the person instance is accessible
+            //checking the condition to enter the Razor C# codeblock allows conditionally
+            //processing view data in the view itself according to varying data model values
+            person.Name = "newName";
+            double age = Math.Round((DateTime.Now - person.DateOfBirth).Value.TotalDays / 365.25);
+
+            //inside @{} codeblocks HTML can be inserted directly, so if the code block is skipped
+            //this HTML will not be in the content of the view file sent back
+            <p> 
+                First, C# code executed inside the chosen View file serverside,
+                and then the HTML content is returned to the browser
+                here the person.Name has been updated to @person.Name, and age is @age
+            </p>
+        } else //else, else if
+        {
+            //do something else
+        }
+
+        @switch(person.Gender)
+        {
+            case Gender.Male:
+                //do something...
+                <p>November 19 men's day</p>
+                break;
+            case Gender.Female:
+                //do something...
+                <p>March 8 women's day</p>
+                break;
+            case Gender.Other: 
+                //do something...
+            <p>March 31 trangender's' day</p>
+                break;
+            default:
+                break;
+        }
+
+        @foreach (PersonModel prsn in people)
+        {
+            <div>
+                Name: @prsn.Name
+                @if (true) { //here the if statement requires @
+                    //do something...
+                    <a href="/person-details/@prsn.Name">details</a>
+                }
+            </div>
+        }
+
+        <text>the gender of the first 2:</text>
+        @for (int i = 0; i < 2; i++)
+        {
+            //while, do while, for, foreach loops are available
+            //prefixed by @ symbol in Razor
+            person = people[i];
+            <div>
+                @person.Gender 
+            </div>
+        }
+    </body>
+</html>

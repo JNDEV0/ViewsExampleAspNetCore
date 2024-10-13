@@ -1,0 +1,22 @@
+﻿@*
+    this filename is fixed, must be exact to work
+    the order of execution is:
+    _ViewImports.cshtml
+    _ViewStart.cshtml
+    View...
+    LayoutView
+    so the point is ViewImports will run before any view is executed,
+    so this can be used to import any usage statements that will be common
+    ammongst the views associated with the controller.
+    in this case we import the Models namespace,
+    that would otherwise need to be imported in each View file individually
+    the _ViewImports file can also be added at the root Views folder,
+    which will run before _ViewImports inside controller view folders like Home
+    so using _ViewImports there can be two layers of imports,
+    first the default viewimports for all views, independent of controller
+    next viewimports for specific controller folder, and 
+    finally any imports inside the actual view.cshtml file being executed
+
+    W
+*@
+@using ViewsExample.Models; 

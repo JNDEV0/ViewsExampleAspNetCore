@@ -1,0 +1,14 @@
+﻿@*
+    this Layout is not actually used in the project, apart from illustrating multiple layouts sharing a common MasterLayout,
+    In this case Layouts can also be nested, that is, a Layout can have its own Layout, that receives the output of the first,
+    the same way as a target view points to its Layout that receives the view's output.
+
+    this nesting is not common but is a solution that can be used, for example MasterLayout contains a common navbar, scripts CSS etc
+    and the nested layouts vary from the landing page, to the project view, to the reviews, to the contact pages etc,
+    each which may have their own specific content that gets passed to the nested layouts and filled into the the target nested layout structure
+
+    here _Layout2 shares a common MasterLayout with _Layout
+*@
+@{
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}

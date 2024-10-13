@@ -1,0 +1,13 @@
+﻿@*
+    when a view is returned by an action method there is an order of execution to reach the response HTML
+    first GLOBAL Views folder _ViewImports is used for C# namespaces and package imports
+    then GLOBAL Views folder _ViewStart is used to initialize view related properties, like Layout and ViewData ViewBag
+    then specific view, for eaxmple Home/Index once it finishes execution it transfers output to the named _Layout if any
+    which finally inserts the output of the view into @RenderBody call in the layout
+*@
+@{
+    //since this is a global ViewStart, all views will point to this _Layout in Shared folder, unless overriden
+    //a target layout may be conditional as regular C# code, such as if ViewBag.ProductId != null point at _Layout2.cshtml
+    //or if device == tablet sideBarLayout instead of navBarLayout
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
